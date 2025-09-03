@@ -36,7 +36,8 @@ func transformation(lines []string, column int, numeric, revers, unique bool) []
 		fieldsI := strings.Split(lines[i], "\t")
 		fieldsJ := strings.Split(lines[j], "\t")
 
-		var a, b string
+		a, b := lines[i], lines[j]
+
 		if column < len(fieldsI) {
 			a = fieldsI[column]
 		}
