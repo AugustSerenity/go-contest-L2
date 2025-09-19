@@ -1,11 +1,20 @@
 package handler
 
-import "net/http"
+import (
+	"encoding/json"
+	"net/http"
 
-type Handler struct{}
+	"l2.18/internal/model"
+)
 
-func New() *Handler {
-	return &Handler{}
+type Handler struct {
+	service Service
+}
+
+func New(s Service) *Handler {
+	return &Handler{
+		service: s,
+	}
 }
 
 func (h *Handler) Route() http.Handler {
@@ -22,6 +31,23 @@ func (h *Handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	
+	var eventRequest model.Request
+	err := json.NewDecoder(r.Body).Decode(&eventRequest)
+	if err != nil {
+		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		return
+	}
+
+	event, err := model.CastToEvent(eventRequest)
+	if err != nil {
+		//...
+		return
+	}
+
+	err = h.service.CreateEvent(eventRequest.UserID, event)
+	if err != nil {
+		//...
+		return
+	}
 
 }
