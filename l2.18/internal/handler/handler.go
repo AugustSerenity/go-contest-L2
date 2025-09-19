@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"l2.18/internal/middleware"
 	"l2.18/internal/model"
 )
 
@@ -20,7 +21,7 @@ func New(s Service) *Handler {
 func (h *Handler) Route() http.Handler {
 	router := http.NewServeMux()
 
-	router.HandleFunc("POST /create_event", h.CreateEvent)
+	router.HandleFunc("POST /create_event", middleware.LoggingMiddleware(h.CreateEvent))
 
 	return router
 }
