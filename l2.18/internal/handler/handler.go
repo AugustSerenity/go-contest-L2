@@ -4,6 +4,7 @@ import (
 	"encoding/json"
 	"net/http"
 
+	"l2.18/internal/handler/response"
 	"l2.18/internal/middleware"
 	"l2.18/internal/model"
 )
@@ -28,27 +29,29 @@ func (h *Handler) Route() http.Handler {
 
 func (h *Handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 	if r.Method != http.MethodPost {
-		http.Error(w, "Only POST method is allowed", http.StatusBadRequest)
+		response.SendError(w, http.StatusMethodNotAllowed, "method not allowed")
 		return
 	}
 
 	var eventRequest model.Request
 	err := json.NewDecoder(r.Body).Decode(&eventRequest)
 	if err != nil {
-		http.Error(w, "Invalid JSON", http.StatusBadRequest)
+		response.SendError(w, http.StatusBadRequest, "bad request")
 		return
 	}
 
 	event, err := model.CastToEvent(eventRequest)
 	if err != nil {
-		//...
+		response.SendError(w, http.StatusBadRequest, err.Error())
 		return
 	}
 
 	err = h.service.CreateEvent(eventRequest.UserID, event)
 	if err != nil {
-		//...
+		response.SendError(w, http.StatusServiceUnavailable, err.Error())
 		return
 	}
+
+	response.SendSuccess(w, http.StatusOK, "successfully created")
 
 }
