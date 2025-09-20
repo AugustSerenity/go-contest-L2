@@ -3,6 +3,7 @@ package handler
 import (
 	"encoding/json"
 	"net/http"
+	"time"
 
 	"l2.18/internal/handler/response"
 	"l2.18/internal/middleware"
@@ -23,6 +24,7 @@ func (h *Handler) Route() http.Handler {
 	router := http.NewServeMux()
 
 	router.HandleFunc("POST /create_event", middleware.LoggingMiddleware(h.CreateEvent))
+	router.HandleFunc("POST /update_event", middleware.LoggingMiddleware(h.UpdateEvent))
 
 	return router
 }
@@ -54,4 +56,37 @@ func (h *Handler) CreateEvent(w http.ResponseWriter, r *http.Request) {
 
 	response.SendSuccess(w, http.StatusOK, "successfully created")
 
+}
+
+func (h *Handler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		response.SendError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+
+	var eventRequest model.Request
+	err := json.NewDecoder(r.Body).Decode(&eventRequest)
+	if err != nil {
+		response.SendError(w, http.StatusBadRequest, "bad request")
+		return
+	}
+
+	originalDate, err := time.Parse("2006-01-02 15:04:05", eventRequest.Date)
+	if err != nil {
+		response.SendError(w, http.StatusBadRequest, "invalid date format (expected YYYY-MM-DD HH:MM:SS)")
+		return
+	}
+
+	event, err := model.CastToEvent(eventRequest)
+	if err != nil {
+		response.SendError(w, http.StatusBadRequest, err.Error())
+		return
+	}
+	err = h.service.UpdateEvent(eventRequest.UserID, originalDate, event)
+	if err != nil {
+		response.SendError(w, http.StatusServiceUnavailable, err.Error())
+		return
+	}
+
+	response.SendSuccess(w, http.StatusOK, "successfully updated")
 }

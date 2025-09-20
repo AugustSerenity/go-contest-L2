@@ -21,10 +21,23 @@ func (s *Service) CreateEvent(id int, event model.Event) error {
 	if !event.Date.After(time.Now()) {
 		return fmt.Errorf("past date")
 	}
-	if s.storage.EventExists(id, event.Date, event.Name) {
-		return fmt.Errorf("Event already exists")
-	}
-	s.storage.Create(id, event)
 
+	if s.storage.ExactEventExists(id, event.Date, event.Name) {
+		return fmt.Errorf("event already exists")
+	}
+
+	s.storage.Create(id, event)
 	return nil
+}
+
+func (s *Service) UpdateEvent(userID int, date time.Time, updated model.Event) error {
+	if !updated.Date.After(time.Now()) {
+		return fmt.Errorf("past date")
+	}
+
+	if !s.storage.EventAtTimeExists(userID, date) {
+		return fmt.Errorf("event does not exist")
+	}
+
+	return s.storage.Update(userID, date, updated)
 }

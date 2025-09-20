@@ -8,5 +8,7 @@ import (
 
 type Storage interface {
 	Create(id int, event model.Event)
-	EventExists(id int, date time.Time, name string) bool
+	ExactEventExists(userID int, date time.Time, name string) bool
+	Update(userID int, date time.Time, updatedEvent model.Event) error
+	EventAtTimeExists(userID int, date time.Time) bool
 }
