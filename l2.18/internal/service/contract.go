@@ -12,4 +12,5 @@ type Storage interface {
 	Update(userID int, date time.Time, updatedEvent model.Event) error
 	EventAtTimeExists(userID int, date time.Time) bool
 	Delete(userID int, date time.Time, name string) error
+	EventsForDay(userID int, date time.Time) ([]model.Event, error)
 }

@@ -56,3 +56,7 @@ func (s *Service) DeleteEvent(userID int, date time.Time, name string) error {
 
 	return nil
 }
+
+func (s *Service) ShowEventsForDay(userID int, date time.Time) ([]model.Event, error) {
+	return s.storage.EventsForDay(userID, date)
+}
