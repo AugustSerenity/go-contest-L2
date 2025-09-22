@@ -58,5 +58,19 @@ func (s *Service) DeleteEvent(userID int, date time.Time, name string) error {
 }
 
 func (s *Service) ShowEventsForDay(userID int, date time.Time) ([]model.Event, error) {
-	return s.storage.EventsForDay(userID, date)
+	res, err := s.storage.EventsForDay(userID, date)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+}
+
+func (s *Service) ShowEventsForWeek(userID int, date time.Time) ([]model.Event, error) {
+	res, err := s.storage.EventsForWeek(userID, date)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
 }

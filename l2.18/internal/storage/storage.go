@@ -124,3 +124,29 @@ func (st *Storage) EventsForDay(userID int, date time.Time) ([]model.Event, erro
 
 	return result, nil
 }
+
+func (st *Storage) EventsForWeek(userID int, date time.Time) ([]model.Event, error) {
+	st.mu.RLock()
+	defer st.mu.RUnlock()
+
+	userEvents, ok := st.events[userID]
+	if !ok {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	var result []model.Event
+	targetYear, targetWeek := date.ISOWeek()
+	for _, event := range userEvents {
+		eventYear, eventWeek := event.Date.ISOWeek()
+		if eventYear == targetYear &&
+			eventWeek == targetWeek {
+			result = append(result, event)
+		}
+	}
+
+	if len(result) == 0 {
+		return nil, fmt.Errorf("no events for this day")
+	}
+
+	return result, nil
+}

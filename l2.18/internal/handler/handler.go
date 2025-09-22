@@ -28,6 +28,7 @@ func (h *Handler) Route() http.Handler {
 	router.HandleFunc("POST /update_event", middleware.LoggingMiddleware(h.UpdateEvent))
 	router.HandleFunc("POST /delete_event", middleware.LoggingMiddleware(h.DeleteEvent))
 	router.HandleFunc("GET /events_for_day", middleware.LoggingMiddleware(h.EventsForDay))
+	router.HandleFunc("GET /events_for_week", middleware.LoggingMiddleware(h.EventsForWeek))
 
 	return router
 }
@@ -149,6 +150,40 @@ func (h *Handler) EventsForDay(w http.ResponseWriter, r *http.Request) {
 	}
 
 	events, err := h.service.ShowEventsForDay(userID, date)
+	if err != nil {
+		response.SendError(w, http.StatusNotFound, err.Error())
+		return
+	}
+
+	response.SendSuccess(w, http.StatusOK, events)
+}
+
+func (h *Handler) EventsForWeek(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodGet {
+		response.SendError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+
+	userIDStr := r.URL.Query().Get("user_id")
+	dateStr := r.URL.Query().Get("date")
+	if userIDStr == "" || dateStr == "" {
+		response.SendError(w, http.StatusBadRequest, "missing query parameters")
+		return
+	}
+
+	userID, err := strconv.Atoi(userIDStr)
+	if err != nil {
+		response.SendError(w, http.StatusBadRequest, "invalid user_id")
+		return
+	}
+
+	date, err := time.Parse("2006-01-02", dateStr)
+	if err != nil {
+		response.SendError(w, http.StatusBadRequest, "invalid date format (expected YYYY-MM-DD)")
+		return
+	}
+
+	events, err := h.service.ShowEventsForWeek(userID, date)
 	if err != nil {
 		response.SendError(w, http.StatusNotFound, err.Error())
 		return
