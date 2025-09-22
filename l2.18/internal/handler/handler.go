@@ -25,6 +25,7 @@ func (h *Handler) Route() http.Handler {
 
 	router.HandleFunc("POST /create_event", middleware.LoggingMiddleware(h.CreateEvent))
 	router.HandleFunc("POST /update_event", middleware.LoggingMiddleware(h.UpdateEvent))
+	router.HandleFunc("POST /delete_event", middleware.LoggingMiddleware(h.DeleteEvent))
 
 	return router
 }
@@ -90,3 +91,5 @@ func (h *Handler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 
 	response.SendSuccess(w, http.StatusOK, "successfully updated")
 }
+
+func (h *Handler) DeleteEvent(w http.ResponseWriter, r *http.Request) {}

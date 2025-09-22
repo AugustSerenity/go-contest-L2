@@ -35,9 +35,14 @@ func (s *Service) UpdateEvent(userID int, date time.Time, updated model.Event) e
 		return fmt.Errorf("past date")
 	}
 
+	if !updated.Date.Equal(date) {
+		return fmt.Errorf("cannot change event date during update")
+	}
+
 	if !s.storage.EventAtTimeExists(userID, date) {
 		return fmt.Errorf("event does not exist")
 	}
 
-	return s.storage.Update(userID, date, updated)
+	s.storage.Update(userID, date, updated)
+	return nil
 }
