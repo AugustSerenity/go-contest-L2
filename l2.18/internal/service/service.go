@@ -43,7 +43,10 @@ func (s *Service) UpdateEvent(userID int, date time.Time, updated model.Event) e
 		return fmt.Errorf("event does not exist")
 	}
 
-	s.storage.Update(userID, date, updated)
+	if err := s.storage.Update(userID, date, updated); err != nil {
+		return err
+	}
+
 	return nil
 }
 
@@ -52,7 +55,9 @@ func (s *Service) DeleteEvent(userID int, date time.Time, name string) error {
 		return fmt.Errorf("event does not exist")
 	}
 
-	s.storage.Delete(userID, date, name)
+	if err := s.storage.Delete(userID, date, name); err != nil {
+		return err
+	}
 
 	return nil
 }
