@@ -92,4 +92,30 @@ func (h *Handler) UpdateEvent(w http.ResponseWriter, r *http.Request) {
 	response.SendSuccess(w, http.StatusOK, "successfully updated")
 }
 
-func (h *Handler) DeleteEvent(w http.ResponseWriter, r *http.Request) {}
+func (h *Handler) DeleteEvent(w http.ResponseWriter, r *http.Request) {
+	if r.Method != http.MethodPost {
+		response.SendError(w, http.StatusMethodNotAllowed, "method not allowed")
+		return
+	}
+
+	var eventRequest model.Request
+	err := json.NewDecoder(r.Body).Decode(&eventRequest)
+	if err != nil {
+		response.SendError(w, http.StatusBadRequest, "bad request")
+		return
+	}
+
+	date, err := time.Parse("2006-01-02 15:04:05", eventRequest.Date)
+	if err != nil {
+		response.SendError(w, http.StatusBadRequest, "invalid date format")
+		return
+	}
+
+	err = h.service.DeleteEvent(eventRequest.UserID, date, eventRequest.EventName)
+	if err != nil {
+		response.SendError(w, http.StatusNotFound, err.Error())
+		return
+	}
+
+	response.SendSuccess(w, http.StatusOK, "successfully deleted")
+}

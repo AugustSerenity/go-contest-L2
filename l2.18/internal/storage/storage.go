@@ -80,3 +80,22 @@ func (st *Storage) EventAtTimeExists(userID int, date time.Time) bool {
 
 	return false
 }
+
+func (st *Storage) Delete(userID int, date time.Time, name string) error {
+	st.mu.Lock()
+	defer st.mu.Unlock()
+
+	userEvents, ok := st.events[userID]
+	if !ok {
+		return fmt.Errorf("user not found")
+	}
+
+	for i, e := range userEvents {
+		if e.Date.Equal(date) && e.Name == name {
+			st.events[userID] = append(userEvents[:i], userEvents[i+1:]...)
+			return nil
+		}
+	}
+
+	return fmt.Errorf("event not found")
+}

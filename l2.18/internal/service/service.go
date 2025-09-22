@@ -46,3 +46,13 @@ func (s *Service) UpdateEvent(userID int, date time.Time, updated model.Event) e
 	s.storage.Update(userID, date, updated)
 	return nil
 }
+
+func (s *Service) DeleteEvent(userID int, date time.Time, name string) error {
+	if !s.storage.ExactEventExists(userID, date, name) {
+		return fmt.Errorf("event does not exist")
+	}
+
+	s.storage.Delete(userID, date, name)
+
+	return nil
+}

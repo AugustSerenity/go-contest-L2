@@ -11,4 +11,5 @@ type Storage interface {
 	ExactEventExists(userID int, date time.Time, name string) bool
 	Update(userID int, date time.Time, updatedEvent model.Event) error
 	EventAtTimeExists(userID int, date time.Time) bool
+	Delete(userID int, date time.Time, name string) error
 }
