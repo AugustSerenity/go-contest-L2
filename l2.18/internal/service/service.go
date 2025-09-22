@@ -74,3 +74,13 @@ func (s *Service) ShowEventsForWeek(userID int, date time.Time) ([]model.Event, 
 
 	return res, nil
 }
+
+func (s *Service) ShowEventsForMonth(userID int, date time.Time) ([]model.Event, error) {
+	res, err := s.storage.EventsForMonth(userID, date)
+	if err != nil {
+		return nil, err
+	}
+
+	return res, nil
+
+}

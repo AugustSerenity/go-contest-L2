@@ -145,7 +145,31 @@ func (st *Storage) EventsForWeek(userID int, date time.Time) ([]model.Event, err
 	}
 
 	if len(result) == 0 {
-		return nil, fmt.Errorf("no events for this day")
+		return nil, fmt.Errorf("no events for this week")
+	}
+
+	return result, nil
+}
+
+func (st *Storage) EventsForMonth(userID int, date time.Time) ([]model.Event, error) {
+	st.mu.RLock()
+	defer st.mu.RUnlock()
+
+	userEvents, ok := st.events[userID]
+	if !ok {
+		return nil, fmt.Errorf("user not found")
+	}
+
+	var result []model.Event
+	for _, event := range userEvents {
+		if event.Date.Year() == date.Year() &&
+			event.Date.Month() == date.Month() {
+			result = append(result, event)
+		}
+	}
+
+	if len(result) == 0 {
+		return nil, fmt.Errorf("no events for this month")
 	}
 
 	return result, nil

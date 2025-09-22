@@ -12,4 +12,5 @@ type Service interface {
 	DeleteEvent(userID int, date time.Time, name string) error
 	ShowEventsForDay(userID int, date time.Time) ([]model.Event, error)
 	ShowEventsForWeek(userID int, date time.Time) ([]model.Event, error)
+	ShowEventsForMonth(userID int, date time.Time) ([]model.Event, error)
 }
